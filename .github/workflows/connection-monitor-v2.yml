@@ -44,8 +44,10 @@ jobs:
       - name: Install Composio SDK
         run: npm install @composio/core
       - name: Run Connection Monitor
+        continue-on-error: true  # FIX: Don't fail workflow on degraded connections
         run: node .github/scripts/composio/connection-monitor-v2.mjs
       - name: Check for degraded connections
+        if: always()
         id: health
         run: |
           if [ ! -f composio-connection-report.json ]; then
@@ -53,7 +55,7 @@ jobs:
             echo "::warning::composio-connection-report.json missing"
             exit 0
           fi
-          SCORE=$(python3 -c "import json; r=json.load(open('composio-connection-report.json')); print(int(r.get('healthScore', 0) or 0))")
+          SCORE=$(python3 -c "import json; r=json.load(open('composio-connection-report.json')); print(int(r.get('healthScore', 0)))")
           echo "health_score=$SCORE" >> "$GITHUB_OUTPUT"
           echo "Health Score: $SCORE%"
       - name: Notify Slack on degradation
@@ -66,5 +68,5 @@ jobs:
             exit 0
           fi
           curl -fsS -X POST -H 'Content-type: application/json' \
-            --data "{\"text\":\"Warning: Zion Composio Health: ${{ steps.health.outputs.health_score }}% — connections degraded\"}" \
+            --data "{"text":"Warning: Zion Composio Health: ${{ steps.health.outputs.health_score }}% — connections degraded"}" \
             "$SLACK_WEBHOOK_URL"
