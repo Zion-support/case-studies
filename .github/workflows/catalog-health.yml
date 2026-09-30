@@ -38,13 +38,9 @@ jobs:
               echo "OK: $s"
             fi
           done
-          # Bilingual check: homepage may use EN 'Tools' or PT 'Ferramentas'
-          if ! grep -Fq "Tools" <<< "$html" && ! grep -Fq "Ferramentas" <<< "$html"; then
-            echo "MISSING on homepage: Tools|Ferramentas"
-            fail=1
-          else
-            echo "OK: Tools|Ferramentas"
-          fi
+          # NOTE: 'Tools'/'Ferramentas' homepage check removed 2026-09-30 —
+          # homepage no longer carries that section; /free-ai-it-tools/ is
+          # covered by the route probe below.
           js=$(curl -fsSL https://ziontechgroup.com/assets/js/zion-catalog.js)
           js_must=(
             'Discovery $99'
