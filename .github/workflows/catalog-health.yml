@@ -24,7 +24,6 @@ jobs:
             "Caminho comercial oficial"
             "Onde a Zion atua"
             "Prova recente"
-            "Tools"
             "Discovery"
             "Agentes"
             "FinOps"
@@ -39,6 +38,13 @@ jobs:
               echo "OK: $s"
             fi
           done
+          # Bilingual check: homepage may use EN 'Tools' or PT 'Ferramentas'
+          if ! grep -Fq "Tools" <<< "$html" && ! grep -Fq "Ferramentas" <<< "$html"; then
+            echo "MISSING on homepage: Tools|Ferramentas"
+            fail=1
+          else
+            echo "OK: Tools|Ferramentas"
+          fi
           js=$(curl -fsSL https://ziontechgroup.com/assets/js/zion-catalog.js)
           js_must=(
             'Discovery $99'
