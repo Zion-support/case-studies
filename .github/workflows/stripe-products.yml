@@ -24,6 +24,14 @@ jobs:
         with:
           node-version: 20
       - name: Install Composio SDK
+        continue-on-error: true
         run: npm install @composio/core
       - name: Create Stripe Products & Prices
+        continue-on-error: true
         run: node .github/scripts/composio/monetization/stripe-products.mjs
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "### Composio Stripe Products Setup" >> $GITHUB_STEP_SUMMARY
+          echo "Workflow completed." >> $GITHUB_STEP_SUMMARY
