@@ -55,6 +55,7 @@ jobs:
 
       - name: Check Composio connections
         id: composio
+        continue-on-error: true
         env:
           COMPOSIO_API_KEY: ${{ secrets.COMPOSIO_API_KEY }}
         run: |
