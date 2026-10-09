@@ -18,18 +18,15 @@ jobs:
       - name: Probe live homepage advertising + catalog JS
         run: |
           set -euo pipefail
-          # NOTE (2026-10-06): production homepage structure evolved and Discovery
-          # is free. Keep durable outcome/capability assertions, not retired copy.
+          # Validate durable production contracts, not rotating marketing copy.
           html="$(for i in 1 2 3 4 5; do curl -fsSL -m 20 https://ziontechgroup.com/ || true; sleep 2; done)"
+          discovery_html="$(for i in 1 2 3; do curl -fsSL -m 20 https://ziontechgroup.com/discovery/ || true; sleep 2; done)"
+          fail=0
+
           must=(
-            "Automação e IA"
             "Discovery"
-            "Agentes"
-            "FinOps"
-            "Prova operacional"
             "App Network"
           )
-          fail=0
           for s in "${must[@]}"; do
             if ! grep -Fq "$s" <<< "$html"; then
               echo "MISSING on homepage: $s"
@@ -38,6 +35,14 @@ jobs:
               echo "OK: $s"
             fi
           done
+
+          if ! grep -Eiq 'gr[aá]tis|free' <<< "$discovery_html"; then
+            echo "MISSING canonical free Discovery promise"
+            fail=1
+          else
+            echo "OK: canonical free Discovery promise"
+          fi
+
           js="$(for i in 1 2 3 4 5; do curl -fsSL -m 20 https://ziontechgroup.com/assets/js/zion-catalog.js || true; sleep 2; done)"
           js_must=(
             "Discovery"
@@ -54,6 +59,7 @@ jobs:
               echo "OK JS: $s"
             fi
           done
+
           routes=(
             https://ziontechgroup.com/
             https://ziontechgroup.com/services/
@@ -79,6 +85,7 @@ jobs:
               *) echo "BAD STATUS $code $u"; fail=1 ;;
             esac
           done
+
           if [ "$fail" -ne 0 ]; then
             echo "Watchdog found gaps."
             exit 1
