@@ -25,7 +25,7 @@ jobs:
 
           must=(
             "Discovery"
-            "App Network"
+            "Apps Network"
           )
           for s in "${must[@]}"; do
             if ! grep -Fq "$s" <<< "$html"; then
