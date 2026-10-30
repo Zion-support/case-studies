@@ -25,7 +25,6 @@ jobs:
 
           must=(
             "Discovery"
-            "Apps Network"
           )
           for s in "${must[@]}"; do
             if ! grep -Fq "$s" <<< "$html"; then
@@ -35,6 +34,14 @@ jobs:
               echo "OK: $s"
             fi
           done
+
+          # The canonical homepage is Portuguese; keep the English label valid too.
+          if ! grep -Eiq 'Apps Network|Rede de Apps' <<< "$html"; then
+            echo "MISSING on homepage: Apps Network / Rede de Apps"
+            fail=1
+          else
+            echo "OK: Apps Network / Rede de Apps"
+          fi
 
           if ! grep -Eiq 'gr[aá]tis|free' <<< "$discovery_html"; then
             echo "MISSING canonical free Discovery promise"
@@ -91,3 +98,4 @@ jobs:
             exit 1
           fi
           echo "Watchdog green."
+
